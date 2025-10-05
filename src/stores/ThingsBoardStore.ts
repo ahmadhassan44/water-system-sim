@@ -147,6 +147,20 @@ export const useThingsBoardStore = defineStore('thingsboard', () => {
     }).catch(err => console.error('RPC error:', err))
   }
 
+  const sendTelemetry = (deviceType: DeviceType, telemetry: Record<string, any>) => {
+    const deviceId = deviceIds[deviceType]
+    if (!deviceId) return
+
+    fetch(`http://localhost:8080/api/plugins/telemetry/DEVICE/${deviceId}/timeseries/ANY`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(telemetry)
+    }).catch(err => console.error('Telemetry error:', err))
+  }
+
   const disconnect = () => {
     if (ws) {
       ws.close()
@@ -159,6 +173,7 @@ export const useThingsBoardStore = defineStore('thingsboard', () => {
     devices,
     connect,
     disconnect,
-    sendCommand
+    sendCommand,
+    sendTelemetry
   }
 })

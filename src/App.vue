@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, computed } from 'vue'
 import { useThingsBoardStore } from './stores/ThingsBoardStore'
+import { useWaterSimulation } from './stores/WaterSimulation'
 import WaterTank from './components/WaterTank.vue'
 import WaterPump from './components/WaterPump.vue'
 import FlowSensor from './components/FlowSensor.vue'
 import WaterOutlet from './components/WaterOutlet.vue'
 import ConnectionStatus from './components/ConnectionStatus.vue'
+import SimulationControls from './components/SimulationControls.vue'
 
 const store = useThingsBoardStore()
+const simulation = useWaterSimulation()
 
 const undergroundLevel = computed(() => Number(store.devices.undergroundTank.data.level) || 0)
 const overheadLevel = computed(() => Number(store.devices.overheadTank.data.level) || 0)
@@ -25,23 +28,23 @@ const showerStatus = computed(() => Boolean(store.devices.shower.data.status))
 const showerFlow = computed(() => Number(store.devices.shower.data.flow) || 0)
 
 const togglePump = () => {
-  store.sendCommand('waterPump', { status: !pumpStatus.value })
+  simulation.togglePump()
 }
 
 const toggleWashbasin1 = () => {
-  store.sendCommand('washbasin1', { status: !washbasin1Status.value })
+  simulation.toggleWashbasin1()
 }
 
 const toggleWashbasin2 = () => {
-  store.sendCommand('washbasin2', { status: !washbasin2Status.value })
+  simulation.toggleWashbasin2()
 }
 
 const toggleKitchenSink = () => {
-  store.sendCommand('kitchenSink', { status: !kitchenSinkStatus.value })
+  simulation.toggleKitchenSink()
 }
 
 const toggleShower = () => {
-  store.sendCommand('shower', { status: !showerStatus.value })
+  simulation.toggleShower()
 }
 
 onMounted(() => {
@@ -50,6 +53,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   store.disconnect()
+  simulation.stopSimulation()
 })
 </script>
 
@@ -57,7 +61,10 @@ onUnmounted(() => {
   <div class="water-system">
     <div class="header">
       <h1>Water System Simulation</h1>
-      <ConnectionStatus />
+      <div class="header-controls">
+        <SimulationControls />
+        <ConnectionStatus />
+      </div>
     </div>
 
     <div class="system-diagram">
@@ -125,6 +132,11 @@ onUnmounted(() => {
   align-items: flex-start;
   max-width: 1200px;
   margin: 0 auto 40px;
+  gap: 20px;
+}
+
+.header-controls {
+  display: flex;
   gap: 20px;
 }
 

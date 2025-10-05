@@ -14,7 +14,6 @@
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
-    "mqtt": "^5.14.1",
     "pinia": "^3.0.3",
     "vue": "^3.5.22"
   },
